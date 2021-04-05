@@ -1,0 +1,9 @@
+connection:
+  test:
+    databaseName: python_executor
+    user: python_executor_1 
+    password: python_executor_123%21%40%23 
+    host: localhost
+    port: 5432 
+    application: test_app
+
