@@ -6,7 +6,12 @@ class LocalStorageNotSupported extends Error {
 }
 
 export function readStorage(content:string, key:string) {
+    if (typeof window === 'undefined'){
+        return null
+    }
     if (!window.localStorage) {
+        console.error("localStorage is not supported for this browser.")
+        return null
         throw new LocalStorageNotSupported("localStorage is not supported for this browser")
     }
     const fetchedContent = window.localStorage.getItem(content) || "{}"
@@ -21,7 +26,12 @@ export function readStorage(content:string, key:string) {
 }
 
 export function writeStorage(content:string, key:string, value:any) {
+    if (typeof window === 'undefined'){
+        return
+    }
     if (!window.localStorage) {
+        console.error("localStorage is not supported for this browser.")
+        return
         throw new LocalStorageNotSupported("localStorage is not supported for this browser")
     }
     const fetchedContent = window.localStorage.getItem(content) || "{}"
@@ -29,7 +39,7 @@ export function writeStorage(content:string, key:string, value:any) {
     try {
         json = JSON.parse(fetchedContent)
     } catch (err) {
-        return null
+        return
     }
     let newJson = Object.assign({},json,{[key]:value})
 

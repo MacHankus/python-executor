@@ -17,11 +17,10 @@ import { arrayFiller } from '../../../../utils/mock/helpers'
 import ResourceLoader from '../../Utils/ResourceLoader'
 import ProjectCollapsibleRow from './ProjectCollapsibleRow'
 import { withStyles } from '@material-ui/core/styles'
-
+import { processStatsResource } from '../../../../utils/resource/collection'
 
 interface ProjectTableProps {
     headers: string[],
-    rows: object[],
 }
 const styles = {
     root: {
@@ -37,21 +36,30 @@ class ProjectTable extends React.Component<ProjectTableProps, {}> {
                     <TableRow>
                         <TableCell size="small" />
                         {
-                            this.props.headers.map((elem) => (<TableCell size="small">{elem}</TableCell>))
+                            this.props.headers.map((elem) => (<TableCell size="small" key={elem}>{elem}</TableCell>))
                         }
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     <ResourceLoader
-                        resource={fakeFetch(1, arrayFiller(10, projectRouteRowExample), 'projects_stats')}
-                        render={(data: { projects_stats: object[] }) => {
-                            let projects_stats: object[] = data.projects_stats
-                            return projects_stats.map((row: object) => (
+                        resource={fetch(
+                            processStatsResource(),
+                            {
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                mode:'cors'
+                            }
+                        )}
+                        render={(process_stats: object[] ) => {
+                            return process_stats.map((row: object) => (
                                 <ProjectCollapsibleRow key={row.id} row={row} headers={this.props.headers} />
                             ))
                         }}
+                        errorRender={(err: string) => <TableRow>
+                            <TableCell colSpan={this.props.headers.length + 1}>{err}</TableCell>
+                        </TableRow>}
                     />
-
                 </TableBody>
             </Table>
         </TableContainer>)

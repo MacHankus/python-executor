@@ -3,9 +3,9 @@ import Loader from '../Loader/Loader'
 
 
 interface ResourceLoaderProps {
-    resource: Function,
+    resource: Promise<any>,
     render: Function,
-    errorComponent?: React.Component,
+    errorRender?: Function,
     waitingComponent?: React.Component
 }
 interface ResourceLoaderState {
@@ -23,32 +23,45 @@ export default class ResourceLoader extends React.Component<ResourceLoaderProps,
         errorMsg: null
     }
     componentDidMount = async () => {
-        const r = await this.props.resource()
-        if (!r.ok) {
+        try {
+            const r = await this.props.resource
+            console.log('r')
+            console.log(r)
+            if (!r.ok) {
+                this.setState({
+                    isError: true,
+                    errorMsg: r.statusText,
+                    resourceLoaded: true
+                })
+                return
+            }
+            const j = await r.json()
+            console.log('j')
+            console.log(j)
+            this.setState({
+                resourceLoaded: true,
+                data: j
+            })
+        }catch(e){
             this.setState({
                 isError: true,
-                errorMsg: r.statusText,
-                resourceLoaded: true
+                errorMsg: 'Something wrong during data load. Please try again.'
             })
             return
         }
-        const j = await r.json()
-        this.setState({
-            resourceLoaded: true,
-            data: j
-        })
+        
     }
     render() {
         console.log(this.state)
-        if (!this.state.resourceLoaded) {
+        if (!this.state.resourceLoaded && !this.state.isError) {
             if (this.props.waitingComponent) {
                 return this.props.waitingComponent
             }
             return <Loader />
         }
         if (this.state.isError) {
-            if (this.props.errorComponent) {
-                return this.props.errorComponent
+            if (this.props.errorRender) {
+                return this.props.errorRender(this.state.errorMsg)
             }
             return <div>{this.state.errorMsg}</div>
         }

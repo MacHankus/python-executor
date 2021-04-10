@@ -12,5 +12,5 @@ def standard_resource_class(namespace,marshal_model, query, as_list = True):
             for x in db_resource:
                 dict_result.append(x._asdict())
             print(db_resource)
-            return dict_result
+            return dict_result,200
     return Dummy

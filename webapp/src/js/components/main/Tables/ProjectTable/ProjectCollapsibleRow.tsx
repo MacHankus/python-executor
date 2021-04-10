@@ -65,9 +65,10 @@ export default function ProjectCollapsibleRow({ row, headers }: { row: object, h
             mouseY: event.clientY - 4,
           })
     };
+    console.log(row)
     return (
-        <React.Fragment>
-            <TableRow key={row['id']} hover className={clsx({[classes.root]:true, [classes.backgroundOpen]:open})} onContextMenu={menuOpen}>
+        <React.Fragment key={row.id}>
+            <TableRow key={"stable"} component="tr" hover className={clsx({[classes.root]:true, [classes.backgroundOpen]:open})} onContextMenu={menuOpen}>
                 <SmallTableCell>
                     <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                         {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -76,18 +77,18 @@ export default function ProjectCollapsibleRow({ row, headers }: { row: object, h
                 {
                     headers.map((elem) => {
 
-                        return (<SmallTableCell cutTextToIndex={10} component="td" scope="row" dialogTitle={`${elem}`} id={row['id']}>{row[elem]}</SmallTableCell>)
+                        return (<SmallTableCell key={elem} cutTextToIndex={10} component="td" scope="row" dialogTitle={`${elem}`} id={row['id']}>{row[elem]}</SmallTableCell>)
                     })
                 }
 
             </TableRow>
-            <TableRow key={row['id']} className={clsx({[classes.collapsibleRow]:true, [classes.backgroundOpen]:open})}>
+            <TableRow key={"collapse"} className={clsx({[classes.collapsibleRow]:true, [classes.backgroundOpen]:open})}>
                 <SmallTableCell className={classes.cellForCollapsibleContent} colSpan={headers.length + 1} component="td" scope="row">
-                    <ProjectCollapse open={open} />
+                    <ProjectCollapse open={open} id={row.id}/>
                 </SmallTableCell>
             </TableRow >
             <Menu
-                id={`id-project-table-row-menu-${row['id']}`}
+                id={`id-project-table-row-menu-${row.id}`}
                 open={menuState.mouseY !== null}
                 onClose={menuClose}
                 anchorReference="anchorPosition"
@@ -97,8 +98,8 @@ export default function ProjectCollapsibleRow({ row, headers }: { row: object, h
                     : undefined
                 }
               >
-                <MenuItem onClick={menuClose}>Disable</MenuItem>
-                <MenuItem onClick={menuClose}>Playgroung</MenuItem>
+                <MenuItem key={'disable'} onClick={menuClose}>Disable</MenuItem>
+                <MenuItem key={'playgroung'} onClick={menuClose}>Playgroung</MenuItem>
             </Menu>
         </React.Fragment >
     );

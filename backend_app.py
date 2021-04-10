@@ -4,9 +4,10 @@ from connection import Session
 from backend_app_extensions import  api
 
 app = Flask(__name__)
+cors = CORS(app, resources={"/api/*": {"origins": "http://localhost:*"}})
 api.init_app(app)
 
-cors = CORS(app, resources={r".*": {"origins": "http://localhost:*"}})
+
 
 @app.before_request
 def setup():

@@ -35,24 +35,25 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type ProjectCollapseProps = {
-  open: boolean
+  open: boolean,
+  id:number
 }
-export default function ProjectCollapse({ open }: ProjectCollapseProps) {
+export default function ProjectCollapse({ open, id }: ProjectCollapseProps) {
   const classes = useStyles();
   const [value, setValue] = React.useState(0);
 
   const handleChangeValue = (newValue) => {
     setValue(newValue);
   };
-  const getClickedContent = () => {
+  const getClickedContent = (id) => {
     if (value === 0) {
-      return <ProjectTableTasks />
+      return <ProjectTableTasks id={id}/>
     } else if (value === 1) {
-      return <ProjectTableQueues />
+      return <ProjectTableQueues id={id}/>
     }else if (value === 2) {
-      return  <ProjectTableErrors/>
+      return  <ProjectTableErrors id={id}/>
     }else if (value === 3) {
-      return  <ProjectTableRuns/>
+      return  <ProjectTableRuns id={id}/>
     }
   }
   return (<Collapse in={open} timeout="auto" unmountOnExit className={classes.collapse} >
@@ -71,7 +72,7 @@ export default function ProjectCollapse({ open }: ProjectCollapseProps) {
           </TabsContainer>
         </AppBar>
         <Box className={classes.content}>
-          {getClickedContent()}
+          {getClickedContent(id)}
         </Box>
       </Paper>
   </Collapse>

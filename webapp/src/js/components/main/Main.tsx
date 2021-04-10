@@ -15,12 +15,7 @@ const useStyles = makeStyles(theme => ({
         position: 'relative'
     },
 }));
-interface MainProps {
-    loading: {
-        loading: boolean
-    }
-}
-function Main(props: MainProps) {
+function Main(props) {
     const classes = useStyles()
     const {loading} = props;
     return <React.Fragment>

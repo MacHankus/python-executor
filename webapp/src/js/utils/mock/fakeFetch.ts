@@ -1,9 +1,10 @@
 
-function fakeFetch(seconds: number = 1, whatToReturn:object = {}, inside?: string,errorToThrow?: any){
-    return ()=> new Promise((resolve,reject) => {
+let fakeFetch: (seconds: number, whatToReturn:object, inside?: string,errorToThrow?: any) => Promise<any> =
+function(seconds: number = 1, whatToReturn:object = {}, inside?: string,errorToThrow?: any){
+    return new Promise((resolve,reject) => {
         setTimeout(()=>{
             if (errorToThrow){
-                throw errorToThrow()
+                reject(errorToThrow)
             }
             if (inside){
                 whatToReturn = {[inside]:whatToReturn}

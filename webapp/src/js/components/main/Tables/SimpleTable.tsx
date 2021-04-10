@@ -35,7 +35,7 @@ export default function SimpleTable({ small, rows, headers, options = {}, column
                 {
                     headers.map((elem) => {
                         if (small) {
-                            return <SmallTableCell align="right" component="th">{elem}</SmallTableCell>
+                            return <SmallTableCell key={elem} align="right" component="th">{elem}</SmallTableCell>
                         }
                     })
                 }

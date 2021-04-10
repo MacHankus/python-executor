@@ -5,12 +5,20 @@ import ResourceLoader from '../../Utils/ResourceLoader'
 import SimpleTable from '../SimpleTable'
 import {Box} from '@material-ui/core'
 import grey from '@material-ui/core/colors/grey'
+import {processRunResource} from '../../../../utils/resource/collection'
 
-
-export default function ProjectTableTasksQueues(props:any): JSX.Element {
+export default function ProjectTableRuns({id}:{id:number}): JSX.Element {
     return <React.Fragment>
         <ResourceLoader 
-        resource={fakeFetch(1,{runs:runsExamples})}
+        resource={fetch(
+            processRunResource(id),
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                mode:'cors'
+            }
+        )}
         render={({runs}:{runs:object})=>{
             return (<Box mb={2}>
                 <SimpleTable
