@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, BigInteger, CheckConstraint, ForeignKey
 from sqlalchemy.sql import text
 from sqlalchemy.schema import MetaData
-
+import datetime as dt
 Base = declarative_base()
 
 
@@ -24,11 +24,13 @@ class DictModel():
 
 class LogModel():
     id = Column(BigInteger(), primary_key = True)
+    subject = Column(String(),nullable=False),
+    id_subject = Column(BigInteger(),nullable=False)
+    create_date = Column(DateTime(),default = dt.datetime.now())
     start_date = Column(DateTime())
     end_date = Column(DateTime())
     mod_date = Column(DateTime())
-    create_date = Column(DateTime())
-    blocking = Column(Boolean())
+    working = Column(Boolean())
     success = Column(Boolean())
     error_msg = Column(String())
 
@@ -53,8 +55,9 @@ class ProcessRun(Base,MainModel):
     start_date = Column(DateTime(), server_default = text("current_timestamp"))
     end_date = Column(DateTime())
     last_activity_date = Column(DateTime(), default = datetime.datetime.now())
+    error_msg = Column(String())
     success = Column(Boolean())
-    logs = relationship("ProcessRunLog")
+    logs = relationship("Log")
 
 class Queue(Base,MainModel):
     __tablename__="queue"
@@ -63,10 +66,6 @@ class Queue(Base,MainModel):
     run_order = Column(BigInteger(),nullable=False)
     blocking = Column(Boolean(), nullable=False)
     queues_tasks = relationship("QueueTask", lazy="joined")
-class QueueLog(Base,LogModel):
-    __tablename__="queue_log"
-    run_id = Column(BigInteger(),ForeignKey('run.id'))
-    queue_id = Column(BigInteger(),ForeignKey('queue.id'))
 
 class TaskTypeDict(Base,DictModel):
     __tablename__="d_task_type"
@@ -95,16 +94,9 @@ class QueueTask(Base,MainModel):
     task = relationship("Task",back_populates="queues_tasks", lazy="joined")
     queue = relationship("Queue",back_populates="queues_tasks", lazy="joined")
 
-class QueueTaskLog(Base,LogModel):
-    __tablename__="queue_task_log"
+class Log(Base,LogModel):
+    __tablename__="log"
     run_id = Column(BigInteger(),ForeignKey('run.id'), nullable=False)
-    queue_log_id = Column(BigInteger(),ForeignKey('queue_log.id'), nullable=False)
-    queue_task_id = Column(BigInteger(),ForeignKey('queue_task.id'), nullable=False)
-    queue_id = Column(BigInteger(),ForeignKey('queue.id'), nullable=False)
-    task_id = Column(BigInteger(),ForeignKey('task.id'), nullable=False)
-
-class ProcessRunLog(Base,LogModel):
-    __tablename__="run_log"
-    run_id = Column(BigInteger(),ForeignKey('run.id'), nullable=False)
+    process_id = Column(BigInteger(),ForeignKey('process.id'), nullable=False)
 
  

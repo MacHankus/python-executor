@@ -9,14 +9,6 @@ import threading
 import traceback
 import argparse 
 
-parser = argparse.ArgumentParser(description='Task executor for sql files, commands and additional python functions.')
-parser.add_argument(
-    '-id','--processid', 
-    dest='process_id',
-    required=True, 
-    type=int, 
-    help='ID of process to run. From db process table.')
-args = parser.parse_args()
 
 def split_by_order(arr):
     splitted = {}
@@ -234,7 +226,16 @@ class MainExecutor():
                 
 
 
+if __name__ =='__main__' : 
+    parser = argparse.ArgumentParser(description='Task executor for sql files, commands and additional python functions.')
+    parser.add_argument(
+        '-id','--processid', 
+        dest='process_id',
+        required=True, 
+        type=int, 
+        help='ID of process to run. From db process table.')
+    args = parser.parse_args()
 
-ex = MainExecutor(2)
-ex.prepare()
-ex.execute()
+    ex = MainExecutor(2)
+    ex.prepare()
+    ex.execute()

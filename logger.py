@@ -14,12 +14,12 @@ def create_logger(app_name, file_name):
     logger.addHandler(fh)
 
     stdout_hdlr = logging.StreamHandler(sys.stdout)
-    #stderr_hdlr = logging.StreamHandler(sys.stderr)
+    stderr_hdlr = logging.StreamHandler(sys.stderr)
     stdout_hdlr.setLevel(logging.DEBUG)
-    #stderr_hdlr.setLevel(logging.DEBUG)
+    stderr_hdlr.setLevel(logging.DEBUG)
     stdout_hdlr.setFormatter(formatter)
-    #stderr_hdlr.setFormatter(formatter)
+    stderr_hdlr.setFormatter(formatter)
     logger.addHandler(stdout_hdlr)
-    #logger.addHandler(stderr_hdlr)
+    logger.addHandler(stderr_hdlr)
     return logger
 
