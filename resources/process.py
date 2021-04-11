@@ -2,7 +2,7 @@ from flask_restx import Namespace, Resource, fields
 from sqlalchemy.orm import Query
 from sqlalchemy import func
 from flask import g
-from resources.models import process_namespace as ns, process_model, process_stats_model
+from resources.models import process_namespace as ns, process_model, process_stats_model,queue_model,task_model,run_model
 import models
 from resources.common import standard_resource_class
 from flask_restx import reqparse
@@ -62,3 +62,34 @@ ProcessStatsResourceStandard = standard_resource_class(ns, process_stats_model, 
 class ProcessStatsResource(Resource,ProcessStatsResourceStandard):
     pass
 
+@ns.route('/<int:process_id>/tasks')
+class ProcessTaskResource(Resource):
+    @ns.marshal_with(task_model,as_list=True)
+    def get(self,process_id):
+        tasks = g.session.query(models.Task).join(models.QueueTask).join(models.Queue).filter(models.Queue.process_id == process_id).all()
+        if not tasks:
+            return f"No tasks for process with id {process_id}",404
+        return tasks, 200
+@ns.route('/<int:process_id>/queues')
+class ProcessQueueResource(Resource):
+    @ns.marshal_with(queue_model,as_list=True)
+    def get(self,process_id):
+        queues = g.session.query(models.Queue).filter(models.Queue.process_id == process_id).all()
+        if not queues:
+            return f"No queues for process with id {process_id}",404
+        return queues, 200
+@ns.route('/<int:process_id>/runs')
+class ProcessRunResource(Resource):
+    @ns.marshal_with(run_model,as_list=True)
+    def get(self,process_id):
+        runs = g.session.query(models.ProcessRun).filter(models.ProcessRun.process_id == process_id).all()
+        if not runs:
+            return f"No runs for process with id {process_id}",404
+        return runs, 200
+@ns.route('/<int:process_id>/errors')
+class ProcessErrorResource(Resource,ProcessResourceStandard):
+    def get(self,process_id):
+        queues = g.session.query(models.Queue).filter(models.Queue.process_id == process_id).all()
+        if not queues:
+            return f"No queues for process with id {process_id}",404
+        return queues, 200

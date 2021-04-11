@@ -1,8 +1,8 @@
 from flask_restx import fields, Namespace
 
-process_namespace = Namespace("process","Get project related data.",path="/api/process")
-queue_namespace = Namespace("queue","Get queue related data.",path="/api/queue")
-task_namespace = Namespace("task","Get task related data.",path="/api/task")
+process_namespace = Namespace("process","Get project related data.",path="/api/processes")
+queue_namespace = Namespace("queue","Get queue related data.",path="/api/queues")
+task_namespace = Namespace("task","Get task related data.",path="/api/tasks")
 
 base = {
     'id': fields.Integer,
@@ -26,9 +26,18 @@ task_queue = {
     'arguments' : fields.String,
     'task_type_id' : fields.Integer
 }
+run = {
+    'process_id' : fields.Integer,
+    'start_date' : fields.DateTime,
+    'end_date': fields.DateTime,
+    'last_activity_date' : fields.DateTime,
+    'error_msg' : fields.String,
+    'success': fields.Boolean
+}
 process_model = process_namespace.model('Process', {**base,**base_process})
 queue_model = process_namespace.model('Queue', {**base,**base_queue})
 task_model = process_namespace.model('Task', {**base,**task_queue})
+run_model = process_namespace.model('Run',{**base,**task_queue})
 
 process_stats_model = process_namespace.model('ProcessStats',{
     'id':fields.Integer,
