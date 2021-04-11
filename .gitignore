@@ -1,4 +1,6 @@
 ./env
+./env/
 ./executor_logs
+./executor_logs/
 ./webapp/node_modules
-./webapp/src
+./webapp/node_modules/
