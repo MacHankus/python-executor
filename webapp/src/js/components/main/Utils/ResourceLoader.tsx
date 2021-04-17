@@ -25,9 +25,15 @@ export default class ResourceLoader extends React.Component<ResourceLoaderProps,
     componentDidMount = async () => {
         try {
             const r = await this.props.resource
-            console.log('r')
-            console.log(r)
             if (!r.ok) {
+                if (r.status === 404){
+                    this.setState({
+                        isError: true,
+                        errorMsg: 'Not Found',
+                        resourceLoaded: true
+                    })
+                    return    
+                }
                 this.setState({
                     isError: true,
                     errorMsg: r.statusText,
@@ -36,8 +42,6 @@ export default class ResourceLoader extends React.Component<ResourceLoaderProps,
                 return
             }
             const j = await r.json()
-            console.log('j')
-            console.log(j)
             this.setState({
                 resourceLoaded: true,
                 data: j

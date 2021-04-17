@@ -4,6 +4,7 @@ from connection import Session
 from backend_app_extensions import  api
 
 app = Flask(__name__)
+
 cors = CORS(app, resources={"/api/*": {"origins": "http://localhost:*"}})
 api.init_app(app)
 
@@ -21,4 +22,5 @@ def finish(resp):
     return resp
 
 if __name__ == '__main__':
+    
     app.run(debug=True)
