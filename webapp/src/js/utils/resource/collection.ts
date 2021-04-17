@@ -3,27 +3,27 @@ import { apiRoot } from './config'
 export let processResource: (id?:number) => string =
     function (id?:number) {
         if(id){
-            return `${apiRoot}/process/${id}`
+            return `${apiRoot}/processes/${id}`
         }
-        return `${apiRoot}/process`
+        return `${apiRoot}/processes`
     }
 export let processQueueResource: (id:number) => string =
     function (id:number) {
-        return `${apiRoot}/process/${id}/queue`
+        return `${apiRoot}/processes/${id}/queues`
     }
 export let processTaskResource: (id:number) => string =
     function (id:number) {
-        return `${apiRoot}/process/${id}/task`
+        return `${apiRoot}/processes/${id}/tasks`
     }
 export let processErrorResource: (id:number) => string =
     function (id:number) {
-        return `${apiRoot}/process/${id}/error`
+        return `${apiRoot}/processes/${id}/errors`
     }
 export let processRunResource: (id:number) => string =
     function (id:number) {
-        return `${apiRoot}/process/${id}/error`
+        return `${apiRoot}/processes/${id}/runs`
     }
 export let processStatsResource: () => string =
     function () {
-        return `${apiRoot}/process/stats`
+        return `${apiRoot}/processes/stats`
     }
