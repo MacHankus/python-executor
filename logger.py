@@ -3,7 +3,7 @@ import sys
 
 def create_logger(app_name, file_name):
     # create logger with 'spam_application'
-    logger = logging.getLogger('app_name')
+    logger = logging.getLogger(app_name)
     logger.setLevel(logging.DEBUG)
     # create file handler which logs even debug messages
     fh = logging.FileHandler(file_name)

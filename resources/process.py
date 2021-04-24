@@ -5,23 +5,13 @@ from flask import g
 from resources.namespaces import process_namespace as ns
 from resources.models import process_model, process_stats_model, queue_model, task_model, run_model, logs_model
 import models
-from resources.common import standard_resource_class
+from resources.common import standard_resource_class, ResourceAdditional, result_to_dict
 from flask_restx import reqparse
 import datetime as dt
-
 
 parser = reqparse.RequestParser()
 parser.add_argument(
     'mode', type=str, help='Declare data that will be return. For now :stats" is valid option.')
-
-
-ProcessResourceStandard = standard_resource_class(
-    ns, process_model, Query([models.Process]))
-
-
-@ns.route('/')
-class ProcessResource(Resource, ProcessResourceStandard):
-    pass
 
 
 process_stats_run_last_success_only = Query([models.ProcessRun.process_id, func.max(models.ProcessRun.end_date).label(
@@ -78,12 +68,15 @@ ProcessStatsResourceStandard = standard_resource_class(
 
 
 @ns.route('/stats')
-class ProcessStatsResource(Resource, ProcessStatsResourceStandard):
-    pass
-
+class ProcessStatsResource(ResourceAdditional):
+    @ns.marshal_with(process_stats_model, as_list=True,envelope="process_stats")
+    def get(self):
+        columns_names = [ x['name'] for x in process_stats_final_query.column_descriptions]
+        stats = process_stats_final_query.with_session(g.session).all()
+        return result_to_dict(columns_names,stats), 200
 
 @ns.route('/<int:process_id>/tasks')
-class ProcessTaskResource(Resource):
+class ProcessTaskResource(ResourceAdditional):
     @ns.marshal_with(task_model, as_list=True, envelope="tasks")
     def get(self, process_id):
         tasks = g.session.query(models.Task).join(models.QueueTask).join(
@@ -92,7 +85,7 @@ class ProcessTaskResource(Resource):
 
 
 @ns.route('/<int:process_id>/queues')
-class ProcessQueueResource(Resource):
+class ProcessQueueResource(ResourceAdditional):
     @ns.marshal_with(queue_model, as_list=True, envelope="queues")
     def get(self, process_id):
         queues = g.session.query(models.Queue).filter(
@@ -101,7 +94,7 @@ class ProcessQueueResource(Resource):
 
 
 @ns.route('/<int:process_id>/runs')
-class ProcessRunResource(Resource):
+class ProcessRunResource(ResourceAdditional):
     @ns.marshal_with(run_model, as_list=True, envelope="runs")
     def get(self, process_id):
         runs = g.session.query(models.ProcessRun).filter(
@@ -110,7 +103,7 @@ class ProcessRunResource(Resource):
 
 
 @ns.route('/<int:process_id>/errors')
-class ProcessErrorResource(Resource):
+class ProcessErrorResource(ResourceAdditional):
     @ns.marshal_with(logs_model, as_list=True, envelope="errors")
     def get(self, process_id):
         errors = g.session.query(models.Log).filter(

@@ -3,7 +3,7 @@ from flask import g
 from resources.namespaces import queue_namespace as ns
 from resources.models import queue_model
 import models
-from resources.common import standard_resource_class
+from resources.common import standard_resource_class, ResourceAdditional
 from sqlalchemy.orm import Query
 
 QueueResourceStandard = standard_resource_class(
@@ -11,5 +11,5 @@ QueueResourceStandard = standard_resource_class(
 
 
 @ns.route('/')
-class QueueResource(Resource, QueueResourceStandard):
+class QueueResource(ResourceAdditional, QueueResourceStandard):
     pass

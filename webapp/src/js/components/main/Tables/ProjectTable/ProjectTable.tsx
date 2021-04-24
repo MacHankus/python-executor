@@ -51,7 +51,9 @@ class ProjectTable extends React.Component<ProjectTableProps, {}> {
                                 mode:'cors'
                             }
                         )}
-                        render={(process_stats: object[] ) => {
+                        render={({process_stats}:{process_stats: object[]} ) => {
+                            console.log('process_stats')
+                            console.log(process_stats)
                             return process_stats.map((row: object) => (
                                 <ProjectCollapsibleRow key={row.id} row={row} headers={this.props.headers} />
                             ))

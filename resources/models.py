@@ -59,3 +59,10 @@ process_stats_model = process_namespace.model('ProcessStats',{
     'number_of_queues':fields.Integer,
     'number_of_tasks':fields.Integer
 })
+
+statistics_model = Model('Statistics',{
+    'start_date':fields.DateTime,
+    'end_date':fields.DateTime,
+    'duration':fields.Integer,
+    'duration_unit':fields.String
+})

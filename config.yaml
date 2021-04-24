@@ -6,4 +6,7 @@ connection:
     host: localhost
     port: 5432 
     application: test_app
+logs:
+  test:
+    logpath: "./executor_logs/"
 

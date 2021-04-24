@@ -3,7 +3,7 @@ from flask import g
 from resources.models import task_model
 import models
 from resources.namespaces import task_namespace as ns
-from resources.common import standard_resource_class
+from resources.common import standard_resource_class, ResourceAdditional
 from sqlalchemy.orm import Query
 
 TaskResourceStandard = standard_resource_class(
@@ -11,5 +11,5 @@ TaskResourceStandard = standard_resource_class(
 
 
 @ns.route('/')
-class TaskResource(Resource, TaskResourceStandard):
+class TaskResource(ResourceAdditional, TaskResourceStandard):
     pass
