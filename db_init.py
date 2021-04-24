@@ -31,8 +31,7 @@ def db_fill_tables(session):
     session.commit()
     process_1 = models.Process(
         name = 'TESTPROCESS_1',
-        description = 'Test process with test tasks and queues.',
-        logfolder = "./executor_logs/TEST_PROCESS_1"
+        description = 'Test process with test tasks and queues.'
     )
     queue_1 = process_1.create_queue()
     queue_1.name = "TEST_QUEUE_1"
@@ -89,8 +88,7 @@ def db_fill_tables(session):
     """"""
     process_2 = models.Process(
         name = 'TESTPROCESS_2',
-        description = 'Test process with test tasks and queues 2.',
-        logfolder = "./executor_logs/TEST_PROCESS_2"
+        description = 'Test process with test tasks and queues 2.'
     )
     session.add(process_2)
     session.commit()

@@ -24,12 +24,11 @@ class DictModel():
 
 class LogModel():
     id = Column(BigInteger(), primary_key = True)
-    subject = Column(String(),nullable=False),
-    id_subject = Column(BigInteger(),nullable=False)
     create_date = Column(DateTime(),default = dt.datetime.now())
     start_date = Column(DateTime())
     end_date = Column(DateTime())
     mod_date = Column(DateTime())
+    blocking = Column(Boolean())
     working = Column(Boolean())
     success = Column(Boolean())
     error_msg = Column(String())
@@ -40,7 +39,6 @@ class Process(Base,MainModel):
     description = Column(String(), nullable = False)
     runs = relationship("ProcessRun", lazy="joined")
     queues = relationship("Queue", lazy="joined")
-    logfolder = Column(String(),nullable=False)
     def create_run(self):
         return ProcessRun(
             process_id = self.id
@@ -98,5 +96,17 @@ class Log(Base,LogModel):
     __tablename__="log"
     run_id = Column(BigInteger(),ForeignKey('run.id'), nullable=False)
     process_id = Column(BigInteger(),ForeignKey('process.id'), nullable=False)
+    blocking = Column(Boolean())
 
- 
+class QueueLog(Base,LogModel):
+    __tablename__="queue_log"
+    run_id = Column(BigInteger(),ForeignKey('run.id'))
+    queue_id = Column(BigInteger(),ForeignKey('queue.id'))
+
+class QueueTaskLog(Base,LogModel):
+    __tablename__="queue_task_log"
+    run_id = Column(BigInteger(),ForeignKey('run.id'), nullable=False)
+    queue_log_id = Column(BigInteger(),ForeignKey('queue_log.id'), nullable=False)
+    queue_task_id = Column(BigInteger(),ForeignKey('queue_task.id'), nullable=False)
+    queue_id = Column(BigInteger(),ForeignKey('queue.id'), nullable=False)
+    task_id = Column(BigInteger(),ForeignKey('task.id'), nullable=False)

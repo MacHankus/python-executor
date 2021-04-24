@@ -24,7 +24,7 @@ export default function ProjectTableRuns({id}:{id:number}): JSX.Element {
                 <SimpleTable
                     options={{thBackground:grey[200],trBackground:grey[100]}} 
                     small 
-                    headers={['id','id_process','start_date','end_date','success','error_msg']}
+                    headers={['id','start_date','end_date','last_activity_date','success','error_msg']}
                     rows={runs}/>
             </Box>)
         }}/>
