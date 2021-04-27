@@ -22,7 +22,7 @@ export default class ResourceLoader extends React.Component<ResourceLoaderProps,
         isError: false,
         errorMsg: null
     }
-    componentDidMount = async () => {
+    load = async () => {
         try {
             const r = await this.props.resource
             if (!r.ok) {
@@ -54,6 +54,9 @@ export default class ResourceLoader extends React.Component<ResourceLoaderProps,
             return
         }
         
+    }
+    componentDidMount(){
+        this.load()
     }
     render() {
         console.log(this.state)

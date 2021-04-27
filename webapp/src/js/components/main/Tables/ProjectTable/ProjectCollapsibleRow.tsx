@@ -42,6 +42,10 @@ const useStyles = makeStyles(theme => ({
         paddingTop: 0,
         border: 'initial'
     },
+    smallCell:{
+        paddingTop:'5px',
+        paddingBottom:'5px'
+    },
     collapsibleRow: {
         borderBottom: '1px solid ' + grey[200],
         transition:'0.2s'
@@ -68,7 +72,7 @@ export default function ProjectCollapsibleRow({ row, headers }: { row: object, h
     console.log(row)
     return (
         <React.Fragment key={row.id}>
-            <TableRow key={"stable"} component="tr" hover className={clsx({[classes.root]:true, [classes.backgroundOpen]:open})} onContextMenu={menuOpen}>
+            <TableRow key={"stable"} component="tr" hover id={"process-id-"+row['id']} className={clsx({[classes.root]:true, [classes.backgroundOpen]:open})} onContextMenu={menuOpen}>
                 <SmallTableCell>
                     <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                         {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
@@ -76,8 +80,12 @@ export default function ProjectCollapsibleRow({ row, headers }: { row: object, h
                 </SmallTableCell>
                 {
                     headers.map((elem) => {
-
-                        return (<SmallTableCell key={elem} cutTextToIndex={10} component="td" scope="row" dialogTitle={`${elem}`} id={row['id']}>{row[elem]}</SmallTableCell>)
+                        if ( ['last_end_date','last_success_date','last_error_date'].includes(elem) ){
+                            return (<SmallTableCell key={elem} cutTextToIndex={['description','last_error_msg'].includes(elem) ? 25 : null} component="td" scope="row" dialogTitle={`${elem}`} data-process-id={row['id']} className={classes.smallCell}>
+                                {row[elem]}
+                            </SmallTableCell>)
+                        }
+                        return (<SmallTableCell key={elem} cutTextToIndex={['description','last_error_msg'].includes(elem) ? 25 : null} component="td" scope="row" dialogTitle={`${elem}`} data-process-id={row['id']} className={classes.smallCell}>{row[elem]}</SmallTableCell>)
                     })
                 }
 

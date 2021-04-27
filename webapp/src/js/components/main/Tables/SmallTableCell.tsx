@@ -13,8 +13,8 @@ const useStyles = makeStyles((theme) => ({
     root: {
         paddingLeft: theme.spacing(1),
         paddingRight: theme.spacing(1),
-        paddingTop: theme.spacing(0),
-        paddingBottom: theme.spacing(0)
+        paddingTop: theme.spacing(0.7),
+        paddingBottom: theme.spacing(0.7)
     }
 }))
 const SmallTableCell: React.FC<smallTableCellProps> = (props) => {
@@ -27,7 +27,7 @@ const SmallTableCell: React.FC<smallTableCellProps> = (props) => {
     const setDialogCloseHandle = (target) => {
         setDialogOpen(false)
     }
-    return <TableCell size="small" className={classes.root} {...props} >
+    return <TableCell size="small"  {...props} className={props.className + " " + classes.root } >
         {React.Children.map(props.children, (child, index) => {
             if (props.cutTextToIndex && typeof child === 'string') {
                 if (!isCutted) setIsCutted(true)
