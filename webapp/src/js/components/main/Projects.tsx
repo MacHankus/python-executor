@@ -5,14 +5,13 @@ import { defaultStateInterface } from '../../redux/store/defaultState'
 import { stopLoading } from '../../redux/actions/loadingActions'
 import { connect } from 'react-redux'
 import ProjectTable from './Tables/ProjectTable/ProjectTable'
-import GetAppIcon from '@material-ui/icons/GetApp';
 import Button from '@material-ui/core/Button';
 import Box from '@material-ui/core/Box';
 import BigTile from './Tiles/BigTile'
 import TileContainer from './Tiles/TileContainer'
 import BarChartIcon from '@material-ui/icons/BarChart';
 import ResourceUsingComponent from './Utils/ResourceUsingComponent'
-
+import TableFilterBar from './Bars/TableFilterBar'
 const styles = (theme: Theme) => createStyles({
 })
 
@@ -35,33 +34,30 @@ class Projects extends React.Component<ProjectProps, {}> {
                     <BigTile title="queues" icon={<BarChartIcon/>}>150</BigTile>
                 </TileContainer>
             </Box>
-            <Box display="flex" justifyContent="flex-end" width="100%" my={1}>
-                <Button
-                    variant="contained"
-                    color="default"
-                    startIcon={<GetAppIcon />}
-                >
-                    Upload
-                </Button>
-            </Box>
+            <TableFilterBar/>
             <Box my={1}>
                 <ResourceUsingComponent
-                    url="http://localhost:5000/api/processes/stats"
+                    baseUrl="http://localhost:5000/api/processes/stats"
                     envelope= "process_stats"
                     enableLoader={false}
+                    lazyLoadId = "lazy-loading-process-table-id"
                     render={(data: object[], loading: boolean)=>{
-                        return (<ProjectTable  headers={[
-                            'id',
-                            'name',
-                            'description',
-                            'last_start_date',
-                            'last_end_date',
-                            'last_success_date',
-                            'last_error_date',
-                            'last_error',
-                            'number_of_queues',
-                            'number_of_tasks',
-                        ]} data={data} loading={loading}/>)
+                        return (<>
+                                <ProjectTable  headers={[
+                                    'id',
+                                    'name',
+                                    'description',
+                                    'last_start_date',
+                                    'last_end_date',
+                                    'last_success_date',
+                                    'last_error_date',
+                                    'last_error',
+                                    'number_of_queues',
+                                    'number_of_tasks',
+                                ]} data={data} loading={loading}/>
+                                <span id="lazy-loading-process-table-id"></span>
+                            </>
+                        )
                     }}
                 />
                 {/*<ProjectTable  headers={[

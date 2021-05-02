@@ -6,14 +6,22 @@ import grey from '@material-ui/core/colors/grey'
 
 type SmallSignProps = {
     variant?: string,
-    color?: string
+    color?: 'transparent' | 'grey'
 }
 const useStyles = makeStyles((theme) => ({
-    root: {
+    rootGrey: {
         borderRadius: '2px',
         color:'white',
         padding:'3px 6px 3px 6px',
-        display:'block'
+        display:'block',
+        background:  grey[800] 
+    },
+    rootTransparent:{
+        borderRadius: '2px',
+        color:grey[800] ,
+        padding:'3px 6px 3px 6px',
+        display:'block',
+        background: 'transparent'
     }
 }))
 const SmallSign: React.FC<SmallSignProps> = ({
@@ -24,7 +32,7 @@ const SmallSign: React.FC<SmallSignProps> = ({
 }) => {
     const classes = useStyles()
     return (
-        <Typography variant="caption" {...props} className={classes.root} style={{ background: color || grey[800] }}>
+        <Typography variant="caption" {...props} className={color === 'grey' ? classes.rootGrey : classes.rootTransparent  }>
             {children}
         </Typography>
     )
