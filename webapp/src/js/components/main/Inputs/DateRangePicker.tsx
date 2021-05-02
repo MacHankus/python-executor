@@ -1,47 +1,94 @@
 import React from 'react'
-import { DatePicker, KeyboardDatePicker } from "@material-ui/pickers";
-import { Grid } from '@material-ui/core'
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
+
+import { DatePicker } from "@material-ui/pickers"
+import { Grid, makeStyles } from '@material-ui/core'
+import ArrowRightIcon from '@material-ui/icons/ArrowRight'
+import moment from 'moment'
+import { Moment } from 'moment'
+import MomentUtils from '@date-io/moment'
+import { MuiPickersUtilsProvider } from '@material-ui/pickers'
+import { ThemeProvider } from "@material-ui/styles"
+import { createMuiTheme } from "@material-ui/core"
+import InputAdornment from '@material-ui/core/InputAdornment'
+import UppercaseText from '../TextEffects/UppercaseText'
+
 
 type DateRangePickerProps = {
-    onChange?: (dateFrom: Date, dateTo: Date) => void
+    onChange?: (dateFrom: Moment, dateTo: Moment) => void
 }
+const newMaterialTheme = createMuiTheme({
+    overrides: {
+        MuiInput: {
+        }
+    },
+})
+const useStyles = makeStyles((theme) => ({
+}))
 const DateRangePicker = function ({ onChange }: DateRangePickerProps) {
-    const [dateTo, setDateTo] = React.useState(new Date())
-    const [dateFrom, setDateFrom] = React.useState(new Date(dateTo.getFullYear(), dateTo.getMonth(), dateTo.getDate() - 5, dateTo.getHours(), dateTo.getMinutes()))
-    const dateChangeHandle = function (what: 'to' | 'from'): React.Dispatch<Date> {
+    const [dateTo, setDateTo] = React.useState<Moment>(moment())
+    const [dateFrom, setDateFrom] = React.useState<Moment>(moment().add(-5, 'days'))
+    const dateChangeHandle = function (what: 'to' | 'from'): (date: Moment) => void {
         const setDate = {
             to: setDateTo,
             from: setDateFrom
         }
-        return setDate[what]
+        return (date: Moment) => { setDate[what](date) }
     }
-    React.useEffect(()=>{
-        if ( onChange ) return onChange(dateTo,dateFrom)
-    },[dateTo,dateFrom])
+    React.useEffect(() => {
+        if (onChange) return onChange(dateTo, dateFrom)
+    }, [dateTo, dateFrom])
     return (
-        <Grid container direction="row" alignItems="center" justify="center">
-            <Grid item>
-                <DatePicker
-                    variant="inline"
-                    label="Calendar"
-                    value={dateFrom}
-                    onChange={dateChangeHandle('from')}
-                />
-            </Grid>
-            <Grid item>
-                <ArrowRightIcon />
-            </Grid>
-            <Grid item>
-                <DatePicker
-                    variant="inline"
-                    label="Calendar"
-                    value={dateTo}
-                    onChange={dateChangeHandle('to')}
-                />
-            </Grid>
-        </Grid>
+        <MuiPickersUtilsProvider utils={MomentUtils}>
+            <ThemeProvider theme={newMaterialTheme}>
+                <Grid container direction="row" alignItems="center" justify="center" spacing={2}>
+                    <Grid item><UppercaseText>from</UppercaseText></Grid>
+                    <Grid item>
+                        <DatePicker
+                            variant="inline"
+                            format="yyyy-MM-DD"
+                            value={dateFrom}
+                            onChange={dateChangeHandle('from')}
+                        />
+                    </Grid>
+                    <Grid item><UppercaseText>to</UppercaseText></Grid>
+                    <Grid item>
+                        <DatePicker
+                            variant="inline"
+                            value={dateTo}
+                            format="yyyy-MM-DD"
+                            onChange={dateChangeHandle('to')}
+                        />
+                    </Grid>
+                </Grid>
+            </ThemeProvider>
+        </MuiPickersUtilsProvider>
     )
 }
-
+/*
+ <Grid container direction="row" alignItems="center" justify="center">
+                    <Grid item>
+                        <DatePicker
+                            variant="inline"
+                            format="yyyy-MM-DD"
+                            value={dateFrom}
+                            onChange={dateChangeHandle('from')}
+                        />
+                    </Grid>
+                    <Grid item>
+                        <DatePicker
+                            variant="inline"
+                            value={dateTo}
+                            format="yyyy-MM-DD"
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <ArrowRightIcon />
+                                    </InputAdornment>
+                                ),
+                            }}
+                            onChange={dateChangeHandle('to')}
+                        />
+                    </Grid>
+                </Grid>
+*/
 export default DateRangePicker
