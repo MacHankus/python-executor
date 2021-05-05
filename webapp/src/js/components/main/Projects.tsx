@@ -12,12 +12,14 @@ import TileContainer from './Tiles/TileContainer'
 import BarChartIcon from '@material-ui/icons/BarChart';
 import ResourceUsingComponent from './Utils/ResourceUsingComponent'
 import TableFilterBar from './Bars/TableFilterBar'
+
 const styles = (theme: Theme) => createStyles({
 })
 
 interface ProjectProps extends WithStyles<typeof styles> {
     stopLoadingHandle: Function
 }
+
 class Projects extends React.Component<ProjectProps, {}> {
     componentDidMount() {
         this.props.stopLoadingHandle()

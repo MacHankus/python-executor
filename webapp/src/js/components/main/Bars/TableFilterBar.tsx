@@ -11,7 +11,10 @@ import InputAdornment from '@material-ui/core/InputAdornment'
 import SearchIcon from '@material-ui/icons/Search'
 import clsx from 'clsx'
 import posed from 'react-pose'
-import DateRangePicker from '../Inputs/DateRangePicker'
+import DateRangePickerInput from '../Inputs/DateRangePickerInput'
+import DatePickerInput from '../Inputs/DatePickerInput'
+import ApiTextInput from '../Inputs/ApiTextInput'
+
 
 type TableFilterBarProps = {
 
@@ -142,7 +145,13 @@ const CollapsingBar: React.FC<CollapsingBarProps> = function ({
         <PosedCollapseBox className={classes.collapseContainer} pose={collapse ? 'collapse' : 'default'} >
             <Grid className={clsx(classes.container)} container item direction="row" justify="flex-end">
                 <Grid item>
-                    <DateRangePicker/>
+                    <DateRangePickerInput/>
+                </Grid>
+                <Grid item>
+                    <DatePickerInput/>
+                </Grid>
+                <Grid item>
+                    <ApiTextInput name={"tetname"}/>
                 </Grid>
             </Grid>
         </PosedCollapseBox>
