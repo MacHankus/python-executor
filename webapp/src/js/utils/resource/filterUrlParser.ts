@@ -1,16 +1,12 @@
-import React from 'react'
 
-interface EqualityOperatorConstructor {
-    new(opr: string, repr: string, descr: string): void
-}
-interface EqualityOperatorInterface {
+export interface EqualityOperatorInterface {
     operator: string,
     representation: string,
     description: string,
-    toString: () => void,
-    buildFrom: (key: string, value: string) => string
+    toString: () => string,
+    buildFrom: (key: string, value: string) => string | null
 }
-const EqualityOperator: EqualityOperatorConstructor = class EqualityOperator implements EqualityOperatorInterface {
+export const EqualityOperator = class EqualityOperator implements EqualityOperatorInterface {
     operator: string
     representation: string
     description: string
@@ -22,18 +18,24 @@ const EqualityOperator: EqualityOperatorConstructor = class EqualityOperator imp
     toString() {
         return this.representation
     }
-    buildFrom(key: string, value: string) {
+    buildFrom(key: string, value: string | null) {
+        if (key === null ){
+            throw Error("Cannot build becouse key is empty.")
+        }
+        if ( value === null || value === '' ){
+            return null
+        }
         return `${key}=${this.representation}:${value}`
     }
 }
 
 export interface EqualityOperatorManagerInterface {
-    like:()=> EqualityOperatorInterface,
+    like:()=>EqualityOperatorInterface,
     regexp:()=>EqualityOperatorInterface,
-    eq:()=> EqualityOperatorInterface,
-    gte:()=> EqualityOperatorInterface,
+    eq:()=>EqualityOperatorInterface,
+    gte:()=>EqualityOperatorInterface,
     lte:()=>EqualityOperatorInterface,
-    gt:()=> EqualityOperatorInterface,
+    gt:()=>EqualityOperatorInterface,
     lt:()=>EqualityOperatorInterface
 }
 const EqualityOperatorManager = class EqualityOperatorManager implements EqualityOperatorManagerInterface {

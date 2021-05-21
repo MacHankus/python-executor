@@ -20,7 +20,7 @@ const useStyles = makeStyles((theme) => ({
         lineHeight:'initial'
     }
 }))
-const SmallSign: React.FC<SmallSignProps> = ({
+const SmallSign: React.FC<SmallSignProps & React.HTMLAttributes<HTMLSpanElement>> = ({
     variant = 'simple',
     color,
     children,
@@ -28,7 +28,7 @@ const SmallSign: React.FC<SmallSignProps> = ({
 }) => {
     const classes = useStyles()
     return (
-        <Typography variant="button" {...props} className={ classes.rootTransparent }>
+        <Typography variant="button" {...props} className={ `${classes.rootTransparent} ${props.className}`}>
             {children}
         </Typography>
     )

@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { DatePicker } from "@material-ui/pickers"
 import { makeStyles } from '@material-ui/core'
 import moment from 'moment'
@@ -11,7 +10,8 @@ import { createMuiTheme } from "@material-ui/core"
 import { DatePickerProps } from '@material-ui/pickers'
 
 type DatePickerInputProps = {
-    onChange?: (date: Moment) => void
+    onChange?: (date: Moment) => void,
+    value?:Moment
 }
 const newMaterialTheme = createMuiTheme({
     overrides: {
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
         position: 'relative'
     }
 }))
-const DatePickerInput = function ({ onChange, ...props }: DatePickerInputProps & DatePickerProps) {
+const DatePickerInput = ({ onChange, ...props }: DatePickerInputProps) => {
     const [date, setDate] = React.useState<Moment>(moment())
     React.useEffect(() => {
         if (onChange) onChange(date)

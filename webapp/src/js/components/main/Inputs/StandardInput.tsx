@@ -1,16 +1,13 @@
 import React from 'react'
 import { Grid, makeStyles, TextField, TextFieldProps } from '@material-ui/core'
 
-type StandardInputProps = {
-    onChange?: (value: number | string | null) => void
-}
 
 const useStyles = makeStyles((theme) => ({
     rootDiv: {
         position: 'relative'
     }
 }))
-const StandardInput = function ({ onChange, ...props }: TextFieldProps & StandardInputProps) {
+const StandardInput = function ({ onChange, ...props }: TextFieldProps) {
     const [value, setValue] = React.useState(null)
     React.useEffect(() => {
         if (onChange) onChange(value)
@@ -25,4 +22,4 @@ const StandardInput = function ({ onChange, ...props }: TextFieldProps & Standar
     )
 }
 
-export default DatePickerInput
+export default StandardInput

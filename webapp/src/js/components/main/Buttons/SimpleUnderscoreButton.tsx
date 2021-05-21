@@ -8,7 +8,7 @@ import grey from '@material-ui/core/colors/grey'
 
 type SimpleUnderscoreButtonProps = {
     size?: "small",
-    variant?: "fromCenter",
+    variant?: "fromCenter" | "fromLeft" | "fromRight",
     selfManage?: boolean,
     clicked?: boolean,
     onClick?: (e:React.MouseEvent<HTMLButtonElement, MouseEvent>,state:{}, props:{}, children: React.ReactNode)=> void,
@@ -71,6 +71,15 @@ const useStyles = makeStyles({
         position: 'absolute',
         background: grey[700],
     },
+    leftSlide:{
+        bottom: 0,
+        left: 0,
+        transform: 'translate(-50%,-50%)',
+        height: '100%',
+        width: lineHeight,
+        position: 'absolute',
+        background: grey[700],  
+    }
 })
 const defaultPosition = {
     width: '0%',

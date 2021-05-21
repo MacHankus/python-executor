@@ -3,8 +3,9 @@ import { makeStyles } from '@material-ui/core/styles'
 import Typography from '@material-ui/core/Typography'
 import Box from '@material-ui/core/Box'
 import grey from '@material-ui/core/colors/grey'
+import { ButtonBaseProps } from '@material-ui/core'
 
-type SmallSignProps = {
+export type SmallSignProps = {
     variant?: string,
     color?: 'transparent' | 'grey'
 }
@@ -13,18 +14,16 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: '2px',
         color:'white',
         padding:'3px 6px 3px 6px',
-        display:'block',
         background:  grey[800] 
     },
     rootTransparent:{
         borderRadius: '2px',
         color:grey[800] ,
         padding:'3px 6px 3px 6px',
-        display:'block',
         background: 'transparent'
     }
 }))
-const SmallSign: React.FC<SmallSignProps> = ({
+const SmallSign: React.FC<SmallSignProps & ButtonBaseProps> = ({
     variant = 'simple',
     color,
     children,

@@ -36,45 +36,32 @@ class Projects extends React.Component<ProjectProps, {}> {
                     <BigTile title="queues" icon={<BarChartIcon/>}>150</BigTile>
                 </TileContainer>
             </Box>
-            <TableFilterBar/>
-            <Box my={1}>
-                <ResourceUsingComponent
-                    baseUrl="http://localhost:5000/api/processes/stats"
-                    envelope= "process_stats"
-                    enableLoader={false}
-                    lazyLoadId = "lazy-loading-process-table-id"
-                    render={(data: object[], loading: boolean)=>{
-                        return (<>
-                                <ProjectTable  headers={[
-                                    'id',
-                                    'name',
-                                    'description',
-                                    'last_start_date',
-                                    'last_end_date',
-                                    'last_success_date',
-                                    'last_error_date',
-                                    'last_error',
-                                    'number_of_queues',
-                                    'number_of_tasks',
-                                ]} data={data} loading={loading}/>
-                                <span id="lazy-loading-process-table-id"></span>
-                            </>
-                        )
-                    }}
-                />
-                {/*<ProjectTable  headers={[
-                    'id',
-                    'name',
-                    'description',
-                    'last_start_date',
-                    'last_end_date',
-                    'last_success_date',
-                    'last_error_date',
-                    'last_error',
-                    'number_of_queues',
-                    'number_of_tasks',
-                ]} data={[]}/>*/}
-            </Box>
+            
+            <ResourceUsingComponent
+                baseUrl="http://localhost:5000/api/processes/stats"
+                envelope= "process_stats"
+                enableLoader={false}
+                lazyLoadId = "lazy-loading-process-table-id"
+                render={(data: object[], loading: boolean, setQueryObjectAndLoadNew:Function)=>{
+                    return (<Box my={1}>
+                        <TableFilterBar reloadQueryPartsAndLoadNewData={setQueryObjectAndLoadNew}/>
+                        <ProjectTable  headers={[
+                            'id',
+                            'name',
+                            'description',
+                            'last_start_date',
+                            'last_end_date',
+                            'last_success_date',
+                            'last_error_date',
+                            'last_error',
+                            'number_of_queues',
+                            'number_of_tasks',
+                        ]} data={data} loading={loading}/>
+                        <span id="lazy-loading-process-table-id"></span>
+                    </Box>
+                    )
+                }}
+            />
         </div>)
     }
 

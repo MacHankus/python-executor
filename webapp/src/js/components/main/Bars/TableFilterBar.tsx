@@ -13,11 +13,13 @@ import clsx from 'clsx'
 import posed from 'react-pose'
 import DateRangePickerInput from '../Inputs/DateRangePickerInput'
 import DatePickerInput from '../Inputs/DatePickerInput'
-import ApiTextInput from '../Inputs/ApiTextInput'
-
+import ApiTextInput from '../Inputs/ApiInputs/ApiTextInput'
+import ApiNumberInput from '../Inputs/ApiInputs/ApiNumberInput'
+import Validator from '../../../utils/resource/validators'
+import FindReplaceIcon from '@material-ui/icons/FindReplace';
 
 type TableFilterBarProps = {
-
+    reloadQueryPartsAndLoadNewData: Function
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -26,6 +28,9 @@ const useStyles = makeStyles((theme) => ({
     },
     container: {
         padding: theme.spacing(2)
+    },
+    inputContainer:{
+        width:'100%'
     },
     nowithContainer: {
         width: 'auto'
@@ -37,33 +42,39 @@ const useStyles = makeStyles((theme) => ({
     collapse: {
         height: 'auto',
     },
-    searchTextField:{
-        width:'300px'
+    searchTextField: {
+        width: '300px'
     }
 }))
 
-const TableFilterBar = function ({ }: TableFilterBarProps) {
+const TableFilterBar = function ({ reloadQueryPartsAndLoadNewData }: TableFilterBarProps) {
     const [collapse, setCollapse] = React.useState(false)
+    const [inputs, setInputs] = React.useState({})
     const classes = useStyles()
     const handleCollapse = () => {
         setCollapse(!collapse)
     }
-
+    const handleSetInputs = (name: string, query: string | null, value: any, error:boolean)=>{
+        setInputs(Object.assign({}, inputs, { [name]: {query, error} }))
+    }
+    console.log(inputs)
     return (
         <Box width="100%" my={1}>
             <Paper >
                 <Grid container direction="column">
-                    <VisibleBar onCollapseIconClick={handleCollapse}/>
-                    <CollapsingBar collapse={collapse} />
+                    <VisibleBar onCollapseIconClick={handleCollapse} onApplyFiltersClick={()=>reloadQueryPartsAndLoadNewData(inputs)} update={() => { }} />
+                    <CollapsingBar collapse={collapse} update={handleSetInputs} />
                 </Grid>
             </Paper>
         </Box>)
 }
 
 type VisibleBarProps = {
-    onCollapseIconClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>)=>void
+    onCollapseIconClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+    onApplyFiltersClick?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void,
+    update: () => void
 }
-const VisibleBar = function ({onCollapseIconClick}:VisibleBarProps) {
+const VisibleBar = function ({ onCollapseIconClick, onApplyFiltersClick }: VisibleBarProps) {
     const classes = useStyles()
     return (
         <Grid className={classes.container} container item direction="row" justify="flex-end" spacing={1}>
@@ -114,6 +125,19 @@ const VisibleBar = function ({onCollapseIconClick}:VisibleBarProps) {
                 <Divider orientation="vertical" />
             </Grid>
             <Grid className={classes.nowithContainer} container item alignItems="center">
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<FindReplaceIcon />}
+                    onClick={onApplyFiltersClick}
+                >
+                    Apply Filters
+            </Button>
+            </Grid>
+            <Grid item>
+                <Divider orientation="vertical" />
+            </Grid>
+            <Grid className={classes.nowithContainer} container item alignItems="center">
                 <IconButton aria-label="delete" size="small" onClick={onCollapseIconClick}>
                     <ArrowDownwardIcon fontSize="inherit" />
                 </IconButton>
@@ -129,29 +153,36 @@ const collapseProps = {
     },
     default: {
         height: 0
+    },
+    container:{
+        margin:'initial'
     }
 }
 const PosedCollapseBox = posed(Box)(collapseProps)
 
 type CollapsingBarProps = {
-    collapse: false | true
+    collapse: false | true,
+    update: (name:string, query:string | null, value:any, error:boolean) => void
 }
 
 const CollapsingBar: React.FC<CollapsingBarProps> = function ({
-    collapse
+    collapse, update
 }) {
     const classes = useStyles()
     return (
         <PosedCollapseBox className={classes.collapseContainer} pose={collapse ? 'collapse' : 'default'} >
-            <Grid className={clsx(classes.container)} container item direction="row" justify="flex-end">
+            <Grid className={clsx(classes.inputContainer)} container item direction="row" justify="flex-end" spacing={2}>
                 <Grid item>
-                    <DateRangePickerInput/>
+                    {/* <DateRangePickerInput/> */}
                 </Grid>
                 <Grid item>
-                    <DatePickerInput/>
+                    <ApiTextInput visibleName={"Description"} name="description" onChange={update} validate={Validator.text.likeStatement.validate} />
                 </Grid>
                 <Grid item>
-                    <ApiTextInput name={"tetname"}/>
+                    <ApiTextInput visibleName={"Project Name"} name="project_name" onChange={update} validate={Validator.text.name.validate}/>
+                </Grid>
+                <Grid item>
+                    <ApiNumberInput visibleName={"id"} name="id" onChange={update} validate={Validator.number.number.validate}/>
                 </Grid>
             </Grid>
         </PosedCollapseBox>
