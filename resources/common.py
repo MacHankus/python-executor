@@ -35,9 +35,18 @@ class ResourceAdditional(Resource):
                 'duration_unit':'microseconds'
             }
             if isinstance(returned, tuple):
-                data , *additional = returned
-                data['statistics'] = stats
-                return data,*additional
+                if len(returned) == 3:
+                    data, code, headers  = returned
+                    data['statistics'] = stats
+                    return data,code, headers
+                if len(returned) == 2:
+                    data, code  = returned
+                    data['statistics'] = stats
+                    return data,code, {}
+                if len(returned) == 1:
+                    data, code  = returned
+                    data['statistics'] = stats
+                    return data
             elif isinstance(returned, dict):
                 data = returned
                 data['statistics'] = stats
@@ -62,26 +71,3 @@ def standard_resource_class(namespace,marshal_model, query, as_list = True,envel
             print(dict_result,200)
             return dict_result,200
     return Dummy
-
-def result_to_dict(columns,result):
-    def check_if_array(test):
-        if isinstance(test,tuple) or isinstance(test,list):
-            return True 
-        return False
-    dict_result = None
-    if check_if_array(result) and check_if_array(result[0]):
-        dict_result = []
-        for res in result:
-            if not check_if_array(res):
-                raise TypeError("Provided result is not list of lists")
-            obj = {}
-            for idx,key in enumerate(columns):
-                obj[key] = res[idx]
-            dict_result.append(obj)
-        return dict_result
-    if check_if_array(result):
-        dict_result = {}
-        for idx,key in enumerate(columns):
-            dict_result[key] = result[idx]
-        return dict_result 
-        
