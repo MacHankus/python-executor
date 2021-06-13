@@ -1,13 +1,12 @@
-from typing import Type
 from sqlalchemy.orm import Query
 from sqlalchemy import text
 import abc
 import re 
 from enum import Enum
 from validator_collection import validators, checkers, errors
-from flask import request
-
-
+from flask import request, g
+import base64 
+from resources.common import put_object_into_response
 
 class QueryModifierAbstract(abc.ABC):
     query = None 
@@ -36,6 +35,7 @@ class QMEqual(QueryModifierAbstract):
 class QMLike(QueryModifierAbstract):
     def apply_filter(self,name, value):
         self.query = self.query.filter(name.like(value))
+        
 
 class QMType(Enum):
     gt = 1
@@ -148,13 +148,55 @@ class QueryModifierManager():
 class ColumnDescription():
     def __init__(self):
         self.descriptions = {}
-    def add(self,name, expression, validator):
+        self.cursor = None
+    def add(self,name, expression, validator, cursor = None):
+        if cursor :
+            cursor.validator = validator
+            cursor.name = name
+            cursor.expression = expression
+            if self.cursor: raise ValueError('Cursor has been already defined.')
+            self.cursor = cursor
+
         self.descriptions[name] = name, expression, validator
+
         return self
+
     def __iter__(self):
         for key in self.descriptions:
             yield self.descriptions[key]
 
+class Cursor():
+    def __init__(self, default_value, name, validator, expression):
+        self.default_value = default_value
+        self.name = name
+        self.validator = validator
+        self.expression = expression
+    @property
+    def value(self):
+        return self._value
+    @value.setter
+    def value(self,val):
+        if not val:
+            self._value = self.default_value
+            return
+        val = base64.b64decode(val.encode('utf-8'))
+        self._value = self.validator(val)
+
+class Limit():
+    def __init__(self, default_value, min, max, validator):
+        self.default_value = default_value
+        self.validator = validator
+        self.min = min 
+        self.max = max
+    @property
+    def value(self):
+        return self._value
+    @value.setter
+    def value(self,val):
+        if val is None or val == '':
+            self._value = self.default_value
+            return 
+        self._value = self.validator(val, minimum=self.min, maximum=self.max)
 
 class Pagination():
     """Pagination is used not only for pagination with cursor but for filtering too.
@@ -166,7 +208,7 @@ class Pagination():
 
     Args:
         query (sqlalchemy.orm.Query): Query that will be modified with given arguments from request.
-        cursor_name (str): Name of the column that will be cursor for pagination module.
+        limit (Limit): Limit with configuration values.
         columns_description (ColumnDescription): Object that provides configuration for all columns that should be available for api users.
 
     Example:
@@ -176,34 +218,63 @@ class Pagination():
         >>>     @Pagination(
         >>>         #provide query to be paginated/filtered
         >>>         sqlalchemy.orm.Query(models.SomeModel),
-        >>>         #specify cursor name here, and in description also
-        >>>         'id',
+        >>>         #specify limit
+        >>>         Limit(...args)
         >>>         #specify all available columns here that will be used in filtering or as cursor
         >>>         ColumnDescription() \\
-        >>>             .add('id', models.SomeModel.id, validators.integer) \\
+        >>>             .add('id', models.SomeModel.id, validators.integer, cursor=Cursor('default_value')) \\
         >>>             .add('name', models.SomeModel.name, validators.integer)
         >>>     )
-        >>>     def get(self, paginated_query=None):
-        >>>         result = pagination_query.with_session(g.session).all()
-        >>>         return result , 200
+        >>>     def get(self, paginated_query_result=None):
+        >>>         return paginated_query_result , 200
 
     """
-    def __init__(self,query, cursor_name, columns_description):
+    def __init__(self,query, limit, columns_description):
         if not isinstance(query, Query):
             raise TypeError("query should be instance of sqlalchemy's Query.")
         self.query = query 
-        self.cursor_name = cursor_name 
+        self.cursor = columns_description.cursor 
+        self.limit = limit 
         self.columns_description = columns_description
-    def __call__(self, function, *args, **kwargs):
 
+    def __call__(self, function, *args, **kwargs):
         def wrapper(*args, **kwargs):
+            limit_raw = request.args.get('limit')
+            self.limit.value = limit_raw
+
+            cursor_raw = request.args.get('cursor')
+            self.cursor.value = cursor_raw
+
             qmm = QueryModifierManager(self.query)
             for col, expr, valid in self.columns_description:
                 valuelist = request.args.getlist(col)
                 
                 for val in valuelist:
                     qmm.modify(expr, val, valid)
+            query = qmm.query
+            query = query.filter(self.cursor.expression >= self.cursor.value)
+            query = query.order_by(self.cursor.expression)
+            query = query.limit(self.limit.value + 1)
 
-            returned = function(paginated_query = qmm.query, *args, **kwargs)
+            query_result = query.with_session(g.session).all()
+
+            if len(query_result) > self.limit.value:
+                next_cursor = str(query_result[-1][self.cursor.name])
+            else:
+                next_cursor = None
+
+            #eliminate last row, last row its only for nxt cursor
+            query_result = query_result[:-1]
+
+            returned = function(paginated_query_result = query_result, *args, **kwargs)
+
+            cursor_info = {
+                'name': self.cursor.name,
+                'value': base64.b64encode(str(self.cursor.value).encode()).decode(),
+                'next_value': base64.b64encode(next_cursor.encode()).decode() if next_cursor else None
+            }
+
+            returned = put_object_into_response(returned,'cursor',cursor_info)
+
             return returned 
         return wrapper

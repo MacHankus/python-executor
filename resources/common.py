@@ -5,6 +5,29 @@ from functools import wraps
 from flask_restx import Resource
 from datetime import timezone
 
+def put_object_into_response(response, key, obj):
+    if isinstance(response, tuple):
+        if len(response) == 3:
+            data, code, headers  = response
+            data[key] = obj
+            return data,code, headers
+        if len(response) == 2:
+            data, code  = response
+            print(data)
+            data[key] = obj
+            return data,code, {}
+        if len(response) == 1:
+            data, code  = response
+            data[key] = obj
+            return data
+    elif isinstance(response, dict):
+        data = response
+        data[key] = obj
+        return data
+    else:
+        print("Warning! Unrecognize object returned.")
+        return response
+
 class ResourceAdditional(Resource):
     """Class which extends Resource from flask-restx.
 
@@ -34,26 +57,7 @@ class ResourceAdditional(Resource):
                 'duration':(end_date - start_date).microseconds,
                 'duration_unit':'microseconds'
             }
-            if isinstance(returned, tuple):
-                if len(returned) == 3:
-                    data, code, headers  = returned
-                    data['statistics'] = stats
-                    return data,code, headers
-                if len(returned) == 2:
-                    data, code  = returned
-                    data['statistics'] = stats
-                    return data,code, {}
-                if len(returned) == 1:
-                    data, code  = returned
-                    data['statistics'] = stats
-                    return data
-            elif isinstance(returned, dict):
-                data = returned
-                data['statistics'] = stats
-                return data
-            else:
-                print("Warning [ResourceAdditional]: Unrecognize object returned.")
-                return returned
+            return put_object_into_response(returned, 'stats', stats)
         return wrapper
 
 

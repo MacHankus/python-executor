@@ -21,16 +21,24 @@ parser.add_argument(
 
 @ns.route('/stats')
 class ProcessStatsResource(ResourceAdditional):
-    @ns.marshal_with(process_stats_model, as_list=True,envelope="process_stats")
     @pagination.Pagination(
         query.process_stats_final_query,
-        'id',
+        pagination.Limit(10, 1, 50, validators.integer),
         pagination.ColumnDescription() \
-            .add('id', query.process_stats_final_query.column_descriptions[0]['expr'], validators.integer)
+            .add('id', query.process_stats_final_query.column_descriptions[0]['expr'], validators.integer, cursor=pagination.Cursor(0, None, None, None)) \
+            .add('name', query.process_stats_final_query.column_descriptions[1]['expr'], validators.string) \
+            .add('description', query.process_stats_final_query.column_descriptions[2]['expr'], validators.string) \
+            .add('number_of_queues', query.process_stats_final_query.column_descriptions[3]['expr'], validators.integer) \
+            .add('number_of_tasks', query.process_stats_final_query.column_descriptions[4]['expr'], validators.integer) \
+            .add('last_start_date', query.process_stats_final_query.column_descriptions[5]['expr'], validators.datetime) \
+            .add('last_success_date', query.process_stats_final_query.column_descriptions[6]['expr'], validators.datetime) \
+            .add('last_error_date', query.process_stats_final_query.column_descriptions[7]['expr'], validators.datetime) \
+            .add('last_error', query.process_stats_final_query.column_descriptions[8]['expr'], validators.string)
     )
-    def get(self, paginated_query=None):
+    @ns.marshal_with(process_stats_model, as_list=True,envelope="process_stats")
+    def get(self, paginated_query_result=None):
         # get stats from db
-        stats = paginated_query.with_session(g.session).all()
+        stats = paginated_query_result
         # dump objects into dicts
         mmodel = mm.ProcessStatsResourceSchema()
         dump = mmodel.dump(stats, many=True)
