@@ -6,6 +6,7 @@ from flask_restx import Resource
 from datetime import timezone
 
 def put_object_into_response(response, key, obj):
+    """Puts given object under provided key into Response"""
     if isinstance(response, tuple):
         if len(response) == 3:
             data, code, headers  = response

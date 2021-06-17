@@ -7,6 +7,7 @@ from validator_collection import validators, checkers, errors
 from flask import request, g
 import base64 
 from resources.common import put_object_into_response
+import urllib.parse as urlparse
 
 class QueryModifierAbstract(abc.ABC):
     query = None 
@@ -176,10 +177,10 @@ class Cursor():
         return self._value
     @value.setter
     def value(self,val):
-        if not val:
+        if val is None or val == '':
             self._value = self.default_value
             return
-        val = base64.b64decode(val.encode('utf-8'))
+        val = base64.b64decode(val.encode('utf-8')).decode()
         self._value = self.validator(val)
 
 class Limit():
@@ -196,6 +197,7 @@ class Limit():
         if val is None or val == '':
             self._value = self.default_value
             return 
+        val = urlparse.unquote(val)
         self._value = self.validator(val, minimum=self.min, maximum=self.max)
 
 class Pagination():
@@ -222,7 +224,7 @@ class Pagination():
         >>>         Limit(...args)
         >>>         #specify all available columns here that will be used in filtering or as cursor
         >>>         ColumnDescription() \\
-        >>>             .add('id', models.SomeModel.id, validators.integer, cursor=Cursor('default_value')) \\
+        >>>             .add('id', models.SomeModel.id, validators.integer, cursor=Cursor('default_value',...)) \\
         >>>             .add('name', models.SomeModel.name, validators.integer)
         >>>     )
         >>>     def get(self, paginated_query_result=None):
@@ -238,6 +240,7 @@ class Pagination():
         self.columns_description = columns_description
 
     def __call__(self, function, *args, **kwargs):
+        """Decorator"""
         def wrapper(*args, **kwargs):
             limit_raw = request.args.get('limit')
             self.limit.value = limit_raw
@@ -259,12 +262,13 @@ class Pagination():
             query_result = query.with_session(g.session).all()
 
             if len(query_result) > self.limit.value:
-                next_cursor = str(query_result[-1][self.cursor.name])
+                next_cursor = str(getattr(query_result[-1], self.cursor.name))
+                query_result = query_result[:-1]
             else:
                 next_cursor = None
 
             #eliminate last row, last row its only for nxt cursor
-            query_result = query_result[:-1]
+            
 
             returned = function(paginated_query_result = query_result, *args, **kwargs)
 
