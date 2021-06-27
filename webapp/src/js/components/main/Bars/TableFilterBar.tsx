@@ -179,10 +179,10 @@ const CollapsingBar: React.FC<CollapsingBarProps> = function ({
                     <ApiTextInput visibleName={"Description"} name="description" onChange={update} validate={Validator.text.likeStatement.validate} />
                 </Grid>
                 <Grid item>
-                    <ApiTextInput visibleName={"Project Name"} name="project_name" onChange={update} validate={Validator.text.name.validate}/>
+                    <ApiTextInput visibleName={"Name"} name="project_name" onChange={update} validate={Validator.text.name.validate}/>
                 </Grid>
                 <Grid item>
-                    <ApiNumberInput visibleName={"id"} name="id" onChange={update} validate={Validator.number.number.validate}/>
+                    <ApiNumberInput visibleName={"Id"} name="id" onChange={update} validate={Validator.number.number.validate}/>
                 </Grid>
             </Grid>
         </PosedCollapseBox>
