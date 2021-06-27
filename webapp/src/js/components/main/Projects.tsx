@@ -20,6 +20,20 @@ interface ProjectProps extends WithStyles<typeof styles> {
     stopLoadingHandle: Function
 }
 
+interface ProcessInterface {
+    id : number,
+    name : string,
+    description: string,
+    last_start_date: Date,
+    last_end_date: Date,
+    last_success_date: Date,
+    last_error_date: Date,
+    last_error: string,
+    number_of_queues: number
+    number_of_tasks: number
+}
+
+
 class Projects extends React.Component<ProjectProps, {}> {
     componentDidMount() {
         this.props.stopLoadingHandle()
@@ -42,7 +56,7 @@ class Projects extends React.Component<ProjectProps, {}> {
                 envelope= "process_stats"
                 enableLoader={false}
                 lazyLoadId = "lazy-loading-process-table-id"
-                render={(data: object[], loading: boolean, setQueryObjectAndLoadNew:Function)=>{
+                render={(data: ProcessInterface[], loading: boolean, setQueryObjectAndLoadNew:Function)=>{
                     return (<Box my={1}>
                         <TableFilterBar reloadQueryPartsAndLoadNewData={setQueryObjectAndLoadNew}/>
                         <ProjectTable  headers={[
