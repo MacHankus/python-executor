@@ -1,6 +1,4 @@
-./env
-./env/
-./executor_logs
-./executor_logs/
-./webapp/node_modules
-./webapp/node_modules/
+env/
+executor_logs/
+webapp/node_modules
+*__pycache__*

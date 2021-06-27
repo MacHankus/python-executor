@@ -15,16 +15,6 @@ def db_fill_tables(session):
             id = 2,
             name = "plsql_file",
             description = "File contains PL/SQL instructions"
-        ),
-        models.TaskTypeDict(
-            id = 3,
-            name = "python_code_file",
-            description = "File with python code. file_name contains file with python code."
-        ),
-        models.TaskTypeDict(
-            id = 4,
-            name = "python_function",
-            description = "Python function to execute. This function should be in special module available for main executor to import. arguments field may contain additional arguments to insert into function."
         )
     ]
     session.bulk_save_objects(task_types)
@@ -123,6 +113,51 @@ def db_fill_tables(session):
     session.bulk_save_objects(queues_tasks_3)
     session.bulk_save_objects(queues_tasks_4)
     session.commit()
+
+    process_3 = models.Process(
+        name = 'TESTPROCESS_3',
+        description = 'Test process with test tasks and queues.'
+    )
+    process_4 = models.Process(
+        name = 'TESTPROCESS_4',
+        description = 'Test process with test tasks and queues.'
+    )
+    process_5 = models.Process(
+        name = 'TESTPROCESS_5',
+        description = 'Test process with test tasks and queues.'
+    )
+    process_6 = models.Process(
+        name = 'TESTPROCESS_6',
+        description = 'Test process with test tasks and queues.'
+    )
+    session.add_all([process_3, process_4, process_5, process_6])
+    session.commit()
+    queues_3_6 = [process_3.create_queue(),process_4.create_queue(),process_5.create_queue(),process_6.create_queue()]
+    tasks_3_6 = []
+    queues_3_6_start = 3
+    for q in queues_3_6:
+        q.name = "TEST_QUEUE_FOR_PROCESS_" + str(queues_3_6_start)
+        queues_3_6_start += 1
+        q.description = f"Test process with test tasks and queues with number {str(queues_3_6_start)}."
+        q.run_order = 1
+        q.blocking = True
+        session.add(q)
+        session.commit()
+        for x in range(2):
+            new_queue_task =models.QueueTask()
+            new_queue_task.blocking = True 
+            new_queue_task.queue = q 
+            new_task = models.Task()
+            new_task.task_type_id = 1
+            new_task.file_path = (f"./executor_files/TESTPROCESS_{str(q.process_id)}/sql_{str(x)}.sql")
+            session.add(new_task)
+            new_queue_task.task = new_task
+            new_queue_task.run_order = 1
+            new_queue_task.blocking = True 
+            session.add(new_queue_task)
+        session.commit()
+    
+
 
 if __name__ == "__main__":
     try:

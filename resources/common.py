@@ -5,6 +5,30 @@ from functools import wraps
 from flask_restx import Resource
 from datetime import timezone
 
+def put_object_into_response(response, key, obj):
+    """Puts given object under provided key into Response"""
+    if isinstance(response, tuple):
+        if len(response) == 3:
+            data, code, headers  = response
+            data[key] = obj
+            return data,code, headers
+        if len(response) == 2:
+            data, code  = response
+            print(data)
+            data[key] = obj
+            return data,code, {}
+        if len(response) == 1:
+            data, code  = response
+            data[key] = obj
+            return data
+    elif isinstance(response, dict):
+        data = response
+        data[key] = obj
+        return data
+    else:
+        print("Warning! Unrecognize object returned.")
+        return response
+
 class ResourceAdditional(Resource):
     """Class which extends Resource from flask-restx.
 
@@ -34,17 +58,7 @@ class ResourceAdditional(Resource):
                 'duration':(end_date - start_date).microseconds,
                 'duration_unit':'microseconds'
             }
-            if isinstance(returned, tuple):
-                data , *additional = returned
-                data['statistics'] = stats
-                return data,*additional
-            elif isinstance(returned, dict):
-                data = returned
-                data['statistics'] = stats
-                return data
-            else:
-                print("Warning [ResourceAdditional]: Unrecognize object returned.")
-                return returned
+            return put_object_into_response(returned, 'stats', stats)
         return wrapper
 
 
@@ -62,26 +76,3 @@ def standard_resource_class(namespace,marshal_model, query, as_list = True,envel
             print(dict_result,200)
             return dict_result,200
     return Dummy
-
-def result_to_dict(columns,result):
-    def check_if_array(test):
-        if isinstance(test,tuple) or isinstance(test,list):
-            return True 
-        return False
-    dict_result = None
-    if check_if_array(result) and check_if_array(result[0]):
-        dict_result = []
-        for res in result:
-            if not check_if_array(res):
-                raise TypeError("Provided result is not list of lists")
-            obj = {}
-            for idx,key in enumerate(columns):
-                obj[key] = res[idx]
-            dict_result.append(obj)
-        return dict_result
-    if check_if_array(result):
-        dict_result = {}
-        for idx,key in enumerate(columns):
-            dict_result[key] = result[idx]
-        return dict_result 
-        
