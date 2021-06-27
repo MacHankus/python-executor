@@ -1,10 +1,4 @@
-./env
-./env/
-./executor_logs
-./executor_logs/
-./webapp/node_modules
-./webapp/node_modules/
-./tests/unit_tests/__pycache__
-./tests/unit_tests/__pycache__/*
-./tests/unit_tests/.pytest_cache
-./tests/unit_tests/.pytest_cache/*
+env/
+executor_logs/
+webapp/node_modules
+*__pycache__*

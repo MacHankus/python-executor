@@ -1,13 +1,15 @@
+import base64
 import pytest
 from sqlalchemy.sql.expression import column
-import validator_collection 
-from resources.pagination import QMFactory, QMType, QueryModifierAbstract, Parser, QueryModifierManager
+from sqlalchemy.util.compat import b64encode
+import validator_collection
+from resources.pagination import ColumnDescription, QMFactory, QMType, QueryModifierAbstract, Parser, QueryModifierManager, Limit, Cursor
 from resources.query import process_stats_final_query
 import models
 from sqlalchemy.orm import Query
 from validator_collection import validators
-
-
+import datetime as dt
+import models
 
 
 @pytest.mark.parametrize(
@@ -181,3 +183,140 @@ def test_QueryModifierManager_one_query_change(required_params,added_part):
     #get added query part - it should be the last characters
     compiled_part = compiled[-length:]
     assert compiled_part == added_part.lower()
+
+@pytest.mark.parametrize(
+    'default_value, min, max, validator, value, expected',
+    [
+        pytest.param(
+            10,
+            1,
+            20,
+            validators.integer,
+            '12',
+            12
+        ),
+        pytest.param(
+            10,
+            1,
+            20,
+            validators.integer,
+            '',
+            10
+        ),
+        pytest.param(
+            10,
+            1,
+            20,
+            validators.integer,
+            None,
+            10
+        ),
+        pytest.param(
+            10,
+            1,
+            20,
+            validators.integer,
+            None,
+            22,
+            marks=pytest.mark.xfail(strict = True)
+        ),
+        pytest.param(
+            10,
+            1,
+            20,
+            validators.integer,
+            None,
+            0,
+            marks=pytest.mark.xfail(strict = True)
+        )
+    ]
+)
+def test_Limit( default_value, min, max, validator, value, expected):
+    limit = Limit(default_value, min, max, validator)
+    limit.value = value
+    assert limit.value == expected
+
+#expect is dict here to make it simpler
+@pytest.mark.parametrize(
+    "name, expression, validator, cursor",
+    [
+        pytest.param(
+            'id',
+            models.Process.id,
+            validators.integer,
+            Cursor(0,None,None,None),
+        )
+    ]
+)
+def test_ColumnDescription(name, expression, validator, cursor):
+    cd = ColumnDescription().add(name, expression, validator, cursor)
+    
+    for cdname, cdexpression, cdvalidator in cd :
+        cdname == name 
+        cdexpression = expression
+        cdvalidator = validator
+
+    cursor = cd.cursor
+    cursor.name == name 
+    cursor.expression = expression
+    cursor.validator = validator
+
+
+@pytest.mark.parametrize(
+    'default_value, name, validator, expression, value, expected',
+    [
+        pytest.param(
+            0,
+            'id',
+            validators.integer,
+            process_stats_final_query.column_descriptions[0]['expr'],
+            base64.b64encode('5'.encode('utf-8')).decode(),
+            5
+        ),
+        pytest.param(
+            0,
+            'id',
+            validators.integer,
+            process_stats_final_query.column_descriptions[0]['expr'],
+            base64.b64encode('300'.encode('utf-8')).decode(),
+            300
+        ),
+        pytest.param(
+            0,
+            'id',
+            validators.string,
+            process_stats_final_query.column_descriptions[0]['expr'],
+            base64.b64encode('ID0123'.encode('utf-8')).decode(),
+            'ID0123'
+        ),
+        pytest.param(
+            0,
+            'id',
+            validators.string,
+            process_stats_final_query.column_descriptions[0]['expr'],
+            base64.b64encode('ID0123'.encode('utf-8')).decode(),
+            'ID0123'
+        ),
+        pytest.param(
+            0,
+            'id',
+            validators.datetime,
+            process_stats_final_query.column_descriptions[0]['expr'],
+            base64.b64encode('2021-01-01T00:00:00'.encode('utf-8')).decode(),
+            dt.datetime(2021,1,1)
+        ),
+        pytest.param(
+            0,
+            'id',
+            validators.integer,
+            process_stats_final_query.column_descriptions[0]['expr'],
+            base64.b64encode('agzd'.encode('utf-8')).decode(),
+            'AGZD',
+            marks=pytest.mark.xfail(strict=True)
+        )
+    ]
+)
+def test_Cursor(default_value, name, validator, expression, value, expected):
+    cursor = Cursor(default_value, name, validator, expression)
+    cursor.value = value
+    assert cursor.value == expected
